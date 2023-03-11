@@ -21,8 +21,8 @@ TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
 bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN)
 
-model = replicate.models.get("cjwbw/anything-v4.0")
-version = model.versions.get("42a996d39a96aedc57b2e0aa8105dea39c9c89d9d266caf6bb4327a1c191b061")
+model = replicate.models.get("cjwbw/anything-v3-better-vae")
+version = model.versions.get("09a5805203f4c12da649ec1923bb7729517ca25fcac790e640eaa9ed66573b65")
 
 # Store the last 10 conversations for each user
 conversations = {}
@@ -63,7 +63,13 @@ def image_watermark(img_response):
 def generate_image_replicate(prompt):
     inputs = {
         # Input prompt
-        'prompt': "mdjrny-v4 style" + prompt + "4k resolution",
+        'prompt': prompt,
+
+        # The prompt or prompts not to guide the image generation (what you do
+        # not want to see in the generation). Ignored when not using guidance.
+        'negative_prompt': "lowres, bad anatomy, bad hands, text, error, missing fingers, missing legs, extra digit, "
+                           "fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, "
+                           "signature, watermark, username, blurry, artist name",
 
         # Width of output image. Maximum size is 1024x768 or 768x1024 because
         # of memory limits
@@ -78,15 +84,19 @@ def generate_image_replicate(prompt):
 
         # Number of denoising steps
         # Range: 1 to 500
-        'num_inference_steps': 50,
+        'num_inference_steps': 11,
 
         # Scale for classifier-free guidance
         # Range: 1 to 20
-        'guidance_scale': 6,
+        'guidance_scale': 7,
+
+        # Choose a scheduler.
+        'scheduler': "DPMSolverMultistep",
 
         # Random seed. Leave blank to randomize the seed
         # 'seed': ...,
     }
+
     output = version.predict(**inputs)
     return output[0]
 
