@@ -21,8 +21,8 @@ TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
 
 bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN)
 
-model = replicate.models.get("prompthero/openjourney")
-version = model.versions.get("9936c2001faa2194a261c01381f90e65261879985476014a0a37a334593a05eb")
+model = replicate.models.get("cjwbw/anything-v4.0")
+version = model.versions.get("42a996d39a96aedc57b2e0aa8105dea39c9c89d9d266caf6bb4327a1c191b061")
 
 # Store the last 10 conversations for each user
 conversations = {}
