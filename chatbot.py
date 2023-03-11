@@ -6,7 +6,6 @@ import openai
 from dotenv import load_dotenv
 import telebot
 import requests
-from gtts import gTTS
 from pydub import AudioSegment
 from celery import Celery
 import speech_recognition as sr
