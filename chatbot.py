@@ -117,81 +117,6 @@ def generate_response_chat(message_list):
     return response["choices"][0]["message"]["content"].strip()
 
 
-@app.task
-def generate_response(message_text):
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt="You are an AI named murati and you are in a conversation with a human. You can answer questions, "
-               "provide information, and help with a wide variety of tasks.\n\n" + message_text,
-        temperature=0.7,
-        max_tokens=256,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0
-    )
-
-    return response["choices"][0]["text"].strip()
-
-
-def conversation_tracking(text_message, user_id, old_model=True):
-    """
-    Make remember all the conversation
-    :param old_model: Open AI model
-    :param user_id: telegram user id
-    :param text_message: text message
-    :return: str
-    """
-    # Get the last 10 conversations and responses for this user
-    user_conversations = conversations.get(user_id, {'conversations': [], 'responses': []})
-    user_messages = user_conversations['conversations'][-9:] + [text_message]
-    user_responses = user_conversations['responses'][-9:]
-
-    # Store the updated conversations and responses for this user
-    conversations[user_id] = {'conversations': user_messages, 'responses': user_responses}
-
-    if old_model:
-        # Construct the full conversation history in the "human: bot: " format
-        conversation_history = ""
-        for i in range(min(len(user_messages), len(user_responses))):
-            conversation_history += f"human: {user_messages[i]}\nmurati: {user_responses[i]}\n"
-
-        if conversation_history == "":
-            conversation_history = "human:{}\nmurati:".format(text_message)
-        else:
-            conversation_history += "human:{}\nmurati:".format(text_message)
-
-        # Generate response
-        task = generate_response.apply_async(args=[conversation_history])
-        response = task.get()
-    else:
-        # Construct the full conversation history in the user:assistant, " format
-        conversation_history = []
-
-        for i in range(min(len(user_messages), len(user_responses))):
-            conversation_history.append({
-                "role": "user", "content": user_messages[i]
-            })
-            conversation_history.append({
-                "role": "assistant", "content": user_responses[i]
-            })
-
-        # Add last prompt
-        conversation_history.append({
-            "role": "user", "content": text_message
-        })
-        # Generate response
-        task = generate_response_chat.apply_async(args=[conversation_history])
-        response = task.get()
-
-    # Add the response to the user's responses
-    user_responses.append(response)
-
-    # Store the updated conversations and responses for this user
-    conversations[user_id] = {'conversations': user_messages, 'responses': user_responses}
-
-    return response
-
-
 @bot.message_handler(commands=["start", "help"])
 def start(message):
     if message.text.startswith("/help"):
@@ -260,17 +185,6 @@ def handle_voice(message):
 @bot.message_handler(func=lambda message: True)
 def echo_message(message):
     user_id = message.chat.id
-
-    # Handle /clear command
-    if message.text == '/clear':
-        conversations[user_id] = {'conversations': [], 'responses': []}
-        bot.reply_to(message, "Conversations and responses cleared!")
-        return
-
-    response = conversation_tracking(message.text, user_id, False)
-
-    # Reply to message
-    bot.reply_to(message, response)
 
 
 if __name__ == "__main__":
