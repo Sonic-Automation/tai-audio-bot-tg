@@ -177,12 +177,11 @@ def handle_voice(message):
     else:
         bot.reply_to(message, "Could not generate image, try again later.")
 
+    # Generate response
 
-# Generate response
-
-# Delete the temporary files
-os.remove("voice_message.ogg")
-os.remove("voice_message.wav")
+    # Delete the temporary files
+    os.remove("voice_message.ogg")
+    os.remove("voice_message.wav")
 
 
 @bot.message_handler(func=lambda message: True)
