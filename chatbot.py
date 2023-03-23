@@ -157,7 +157,6 @@ def handle_voice(message):
         text = r.recognize_google(audio_data)
 
     text = text.lower()
-    print(text)
     if "hey murati" in text or "hey marathi" in text:
         text = text.replace("hey murati", "").strip()
         text = text.replace("hey marathi", "").strip()
@@ -179,8 +178,8 @@ def handle_voice(message):
                            caption=caption, parse_mode='Markdown')
         else:
             bot.reply_to(message, "Could not generate image, try again later.")
-    else:
-        bot.reply_to(message, "Please say hey murati at first")
+    # else:
+    #     bot.reply_to(message, "Please say hey murati at first")
 
     # Generate response
 
