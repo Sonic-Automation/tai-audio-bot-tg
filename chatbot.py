@@ -158,8 +158,9 @@ def handle_voice(message):
 
     text = text.lower()
     print(text)
-    if "hey murati" in text:
+    if "hey murati" in text or "hey marathi" in text:
         text = text.replace("hey murati", "").strip()
+        text = text.replace("hey marathi", "").strip()
         task = generate_image_replicate.apply_async(args=[text])
         image_url = task.get()
 
