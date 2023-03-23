@@ -157,6 +157,7 @@ def handle_voice(message):
         text = r.recognize_google(audio_data)
 
     text = text.lower()
+    print(text)
     if "hey murati" in text:
         text = text.replace("hey murati", "").strip()
         task = generate_image_replicate.apply_async(args=[text])
