@@ -136,7 +136,7 @@ def handle_voice(message):
 
     # Send processing
     processing_replay = f"processing command by @{sender_username}"
-    bot.reply_to(message, processing_replay)
+    processing_message = bot.reply_to(message, processing_replay)
 
     file_info = bot.get_file(message.voice.file_id)
     file = requests.get("https://api.telegram.org/file/bot{0}/{1}".format(
@@ -176,6 +176,9 @@ def handle_voice(message):
                        caption=caption, parse_mode='Markdown')
     else:
         bot.reply_to(message, "Could not generate image, try again later.")
+
+    # Delete the processing message
+    bot.delete_message(chat_id=message.chat.id, message_id=processing_message.message_id)
 
     # Generate response
 
